@@ -1,0 +1,92 @@
+<%- include('../../partials/admin-top') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">Quản lý sản phẩm</h4>
+  <a href="/admin/products/create" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Thêm sản phẩm
+  </a>
+</div>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-4">
+    <input type="text" name="keyword" class="form-control form-control-sm"
+           placeholder="Tìm theo tên..." value="<%= typeof keyword !== 'undefined' ? keyword : '' %>">
+  </div>
+  <div class="col-md-3">
+    <select name="category" class="form-select form-select-sm">
+      <option value="">Tất cả danh mục</option>
+      <% categories.forEach(cat => { %>
+        <option value="<%= cat.id %>"><%= cat.name %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select form-select-sm">
+      <option value="">Tất cả</option>
+      <option value="active">Đang bán</option>
+      <option value="inactive">Đã ẩn</option>
+      <option value="out_of_stock">Hết hàng</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+  </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover admin-table mb-0">
+      <thead>
+        <tr>
+          <th style="width:60px">Ảnh</th>
+          <th>Tên sản phẩm</th>
+          <th>Danh mục</th>
+          <th>Giá</th>
+          <th>Tồn kho</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (products.length === 0) { %>
+          <tr><td colspan="7" class="text-center text-muted py-4">Không có sản phẩm</td></tr>
+        <% } %>
+        <% products.forEach(p => { %>
+          <tr>
+            <td>
+              <img src="<%= p.main_image || '/images/no-image.png' %>"
+                   class="product-thumb" alt="" onerror="this.src='/images/no-image.png'">
+            </td>
+            <td>
+              <div class="fw-medium small"><%= p.name %></div>
+              <small class="text-muted"><%= p.brand %> · <%= p.sku %></small>
+            </td>
+            <td class="small"><%= p.category_name %></td>
+            <td class="small">
+              <% if (p.sale_price) { %>
+                <del class="text-muted"><%= Number(p.price).toLocaleString('vi-VN') %>đ</del><br>
+                <span class="text-danger fw-medium"><%= Number(p.sale_price).toLocaleString('vi-VN') %>đ</span>
+              <% } else { %>
+                <%= Number(p.price).toLocaleString('vi-VN') %>đ
+              <% } %>
+            </td>
+            <td><span class="badge <%= p.stock_quantity === 0 ? 'bg-danger' : p.stock_quantity <= 5 ? 'bg-warning text-dark' : 'bg-success' %>"><%= p.stock_quantity %></span></td>
+            <td>
+              <span class="badge <%= p.status === 'active' ? 'bg-success' : p.status === 'inactive' ? 'bg-secondary' : 'bg-warning text-dark' %>">
+                <%= p.status === 'active' ? 'Đang bán' : p.status === 'inactive' ? 'Đã ẩn' : 'Hết hàng' %>
+              </span>
+            </td>
+            <td>
+              <a href="/admin/products/<%= p.id %>/edit" class="btn btn-outline-primary btn-sm">Sửa</a>
+              <form action="/admin/products/<%= p.id %>/delete" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('Xóa sản phẩm này?')">Xóa</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="text-muted small mt-2">Tổng: <%= total %> sản phẩm</p>
+<%- include('../../partials/admin-bot') %>

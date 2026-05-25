@@ -1,0 +1,55 @@
+<%- include('../../partials/admin-top') %>
+<h4 class="fw-bold mb-4">Quản lý bảo hành</h4>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-3">
+    <select name="status" class="form-select form-select-sm">
+      <option value="">Tất cả</option>
+      <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Chờ xử lý</option>
+      <option value="approved" <%= filters.status === 'approved' ? 'selected' : '' %>>Đã duyệt</option>
+      <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Từ chối</option>
+      <option value="processing" <%= filters.status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
+      <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+    </select>
+  </div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary btn-sm">Lọc</button></div>
+</form>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover admin-table mb-0">
+      <thead>
+        <tr><th>Sản phẩm</th><th>Khách hàng</th><th>Đơn hàng</th><th>Vấn đề</th><th>Trạng thái</th><th>Ngày</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% const wColors = {pending:'warning',approved:'info',rejected:'danger',processing:'primary',completed:'success'};
+           const wLabels = {pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Từ chối',processing:'Đang XL',completed:'Hoàn thành'};
+           const TRANSITIONS = {pending:['approved','rejected'],approved:['processing'],rejected:[],processing:['completed'],completed:[]};
+        %>
+        <% requests.forEach(r => { %>
+          <tr>
+            <td class="small fw-medium"><%= r.product_name %></td>
+            <td class="small"><%= r.customer_name %></td>
+            <td class="small">#<%= r.order_code %></td>
+            <td class="small"><%= r.issue_description.substring(0, 50) %>...</td>
+            <td><span class="badge bg-<%= wColors[r.status]||'secondary' %>"><%= wLabels[r.status]||r.status %></span></td>
+            <td class="small text-muted"><%= new Date(r.created_at).toLocaleDateString('vi-VN') %></td>
+            <td>
+              <% if (TRANSITIONS[r.status] && TRANSITIONS[r.status].length > 0) { %>
+                <form action="/admin/warranty/<%= r.id %>/status" method="POST" class="d-flex gap-1">
+                  <select name="status" class="form-select form-select-sm">
+                    <% TRANSITIONS[r.status].forEach(s => { %>
+                      <option value="<%= s %>"><%= wLabels[s] %></option>
+                    <% }); %>
+                  </select>
+                  <button type="submit" class="btn btn-primary btn-sm">OK</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../../partials/admin-bot') %>

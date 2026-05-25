@@ -1,0 +1,47 @@
+<%- include('../partials/top') %>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="card-title mb-4 text-center">
+          <i class="bi bi-person-plus me-2 text-primary"></i>Tạo tài khoản
+        </h4>
+        <form action="/register" method="POST">
+          <div class="mb-3">
+            <label class="form-label fw-medium">Họ và tên <span class="text-danger">*</span></label>
+            <input type="text" name="full_name" class="form-control" required
+                   placeholder="Nguyễn Văn A">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Email <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control" required
+                   placeholder="example@email.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Số điện thoại</label>
+            <input type="tel" name="phone" class="form-control"
+                   placeholder="0912345678 (không bắt buộc)">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Mật khẩu <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control" minlength="8" required
+                   placeholder="Ít nhất 8 ký tự">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+            <input type="password" name="confirm_password" class="form-control" required
+                   placeholder="Nhập lại mật khẩu">
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2">
+            <i class="bi bi-person-check me-2"></i>Đăng ký
+          </button>
+        </form>
+        <hr>
+        <p class="text-center mb-0 text-muted">
+          Đã có tài khoản? <a href="/login" class="text-decoration-none fw-medium">Đăng nhập</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/bot') %>

@@ -1,0 +1,119 @@
+<%- include('../../partials/top') %>
+<% const statusColors = {pending:'warning',confirmed:'info',processing:'primary',shipping:'primary',completed:'success',cancelled:'danger'};
+   const statusLabels = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',processing:'Đang chuẩn bị',shipping:'Đang giao hàng',completed:'Hoàn thành',cancelled:'Đã hủy'};
+   const payLabels = {unpaid:'Chưa thanh toán',pending:'Chờ thanh toán',paid:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'};
+   const payColors = {unpaid:'secondary',pending:'warning',paid:'success',failed:'danger',refunded:'info'};
+%>
+
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/orders">Đơn hàng</a></li>
+    <li class="breadcrumb-item active">#<%= order.order_code %></li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <h5 class="mb-1">#<%= order.order_code %></h5>
+            <small class="text-muted">Đặt ngày <%= new Date(order.created_at).toLocaleDateString('vi-VN') %></small>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge bg-<%= statusColors[order.order_status] || 'secondary' %> fs-6">
+              <%= statusLabels[order.order_status] || order.order_status %>
+            </span>
+            <span class="badge bg-<%= payColors[order.payment_status] || 'secondary' %> fs-6">
+              <%= payLabels[order.payment_status] || order.payment_status %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Sản phẩm</h6>
+        <% order.items.forEach(item => { %>
+          <div class="d-flex gap-3 align-items-center mb-3 pb-3 border-bottom">
+            <img src="<%= item.product_image || '/images/no-image.png' %>"
+                 width="60" height="60" style="object-fit:contain" class="border rounded">
+            <div class="flex-grow-1">
+              <div class="fw-medium"><%= item.product_name %></div>
+              <small class="text-muted"><%= Number(item.price).toLocaleString('vi-VN') %>đ × <%= item.quantity %></small>
+            </div>
+            <div class="fw-bold"><%= Number(item.total_price).toLocaleString('vi-VN') %>đ</div>
+          </div>
+          <% if (order.order_status === 'completed' && !order.reviewedProductIds.includes(item.product_id)) { %>
+            <a href="/reviews/create?product_id=<%= item.product_id %>&order_id=<%= order.id %>"
+               class="btn btn-outline-warning btn-sm mb-2">
+              <i class="bi bi-star me-1"></i>Đánh giá
+            </a>
+          <% } %>
+        <% }); %>
+      </div>
+    </div>
+
+    <% if (['pending', 'confirmed'].includes(order.order_status)) { %>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-bold text-danger mb-2">Hủy đơn hàng</h6>
+          <form action="/orders/<%= order.order_code %>/cancel" method="POST">
+            <div class="mb-2">
+              <input type="text" name="reason" class="form-control"
+                     placeholder="Lý do hủy (không bắt buộc)">
+            </div>
+            <button type="submit" class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('Xác nhận hủy đơn hàng này?')">
+              Hủy đơn hàng
+            </button>
+          </form>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="fw-bold mb-2">Thông tin giao hàng</h6>
+        <p class="mb-1"><strong><%= order.shipping_name %></strong></p>
+        <p class="mb-1"><i class="bi bi-telephone me-1"></i><%= order.shipping_phone %></p>
+        <p class="mb-0 text-muted small"><%= order.shipping_address %></p>
+        <% if (order.note) { %>
+          <p class="mt-2 mb-0 small text-muted"><i class="bi bi-chat-dots me-1"></i><%= order.note %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="fw-bold mb-2">Thanh toán</h6>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Tạm tính</span>
+          <span><%= Number(order.subtotal).toLocaleString('vi-VN') %>đ</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Phí ship</span>
+          <span><%= order.shipping_fee === 0 ? 'Miễn phí' : Number(order.shipping_fee).toLocaleString('vi-VN') + 'đ' %></span>
+        </div>
+        <hr class="my-2">
+        <div class="d-flex justify-content-between fw-bold">
+          <span>Tổng</span>
+          <span class="text-danger"><%= Number(order.total_amount).toLocaleString('vi-VN') %>đ</span>
+        </div>
+        <% if (order.payment) { %>
+          <p class="text-muted small mt-2 mb-0">
+            PP: <%= order.payment.payment_method.toUpperCase() %>
+          </p>
+          <% if (order.payment.paid_at) { %>
+            <p class="small text-muted mb-0">Thanh toán lúc: <%= new Date(order.payment.paid_at).toLocaleString('vi-VN') %></p>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../../partials/bot') %>

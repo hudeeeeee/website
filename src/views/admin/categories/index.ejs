@@ -1,0 +1,48 @@
+<%- include('../../partials/admin-top') %>
+<h4 class="fw-bold mb-4">Quản lý danh mục</h4>
+
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Thêm danh mục mới</h6>
+        <form action="/admin/categories" method="POST">
+          <div class="mb-2">
+            <label class="form-label small">Tên danh mục <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control form-control-sm" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Mô tả</label>
+            <textarea name="description" class="form-control form-control-sm" rows="2"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Thứ tự</label>
+            <input type="number" name="sort_order" class="form-control form-control-sm" value="0">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Thêm danh mục</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-hover admin-table mb-0">
+          <thead><tr><th>#</th><th>Tên</th><th>Slug</th><th>Trạng thái</th><th>Sắp xếp</th></tr></thead>
+          <tbody>
+            <% categories.forEach(cat => { %>
+              <tr>
+                <td><%= cat.id %></td>
+                <td class="fw-medium"><%= cat.name %></td>
+                <td class="small text-muted"><%= cat.slug %></td>
+                <td><span class="badge bg-<%= cat.status === 'active' ? 'success' : 'secondary' %>"><%= cat.status %></span></td>
+                <td><%= cat.sort_order %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../../partials/admin-bot') %>

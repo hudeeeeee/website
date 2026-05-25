@@ -1,0 +1,47 @@
+<%- include('../../partials/admin-top') %>
+<h4 class="fw-bold mb-4">Quản lý đánh giá</h4>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover admin-table mb-0">
+      <thead>
+        <tr><th>Sản phẩm</th><th>Khách</th><th>Rating</th><th>Nội dung</th><th>Trạng thái</th><th>Ngày</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% reviews.forEach(r => { %>
+          <tr>
+            <td class="small"><%= r.product_name %></td>
+            <td class="small"><%= r.full_name %></td>
+            <td>
+              <span class="text-warning">
+                <% for(let i=1;i<=5;i++) { %><i class="bi bi-star<%= i<=r.rating?'-fill':'' %>"></i><% } %>
+              </span>
+              (<%= r.rating %>)
+            </td>
+            <td class="small"><%= r.comment ? r.comment.substring(0,60) + (r.comment.length > 60 ? '...' : '') : '—' %></td>
+            <td>
+              <span class="badge <%= r.status === 'visible' ? 'bg-success' : r.status === 'hidden' ? 'bg-secondary' : 'bg-warning text-dark' %>">
+                <%= r.status %>
+              </span>
+            </td>
+            <td class="small text-muted"><%= new Date(r.created_at).toLocaleDateString('vi-VN') %></td>
+            <td>
+              <% if (r.status === 'visible') { %>
+                <form action="/admin/reviews/<%= r.id %>/status" method="POST" class="d-inline">
+                  <input type="hidden" name="status" value="hidden">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm">Ẩn</button>
+                </form>
+              <% } else { %>
+                <form action="/admin/reviews/<%= r.id %>/status" method="POST" class="d-inline">
+                  <input type="hidden" name="status" value="visible">
+                  <button type="submit" class="btn btn-outline-success btn-sm">Hiện</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../../partials/admin-bot') %>

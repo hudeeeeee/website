@@ -1,0 +1,97 @@
+<%- include('../../partials/top') %>
+<div class="row">
+  <div class="col-md-3 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-4">
+        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;font-size:1.5rem;">
+          <i class="bi bi-person"></i>
+        </div>
+        <h6 class="fw-bold mb-0"><%= user.full_name %></h6>
+        <small class="text-muted"><%= user.email %></small>
+      </div>
+      <div class="list-group list-group-flush">
+        <a href="/profile" class="list-group-item list-group-item-action active">
+          <i class="bi bi-person me-2"></i>Thông tin tài khoản
+        </a>
+        <a href="/orders" class="list-group-item list-group-item-action">
+          <i class="bi bi-bag me-2"></i>Đơn hàng của tôi
+        </a>
+        <a href="/warranty" class="list-group-item list-group-item-action">
+          <i class="bi bi-shield-check me-2"></i>Bảo hành
+        </a>
+        <a href="/profile/change-password" class="list-group-item list-group-item-action">
+          <i class="bi bi-lock me-2"></i>Đổi mật khẩu
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white fw-bold py-3">
+        <i class="bi bi-person-circle me-2 text-primary"></i>Thông tin tài khoản
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small">Họ và tên</label>
+            <p class="fw-medium mb-0"><%= user.full_name %></p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small">Email</label>
+            <p class="fw-medium mb-0"><%= user.email %></p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small">Số điện thoại</label>
+            <p class="fw-medium mb-0"><%= user.phone || '' %><% if (!user.phone) { %><span class="text-muted">Chưa cập nhật</span><% } %></p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small">Ngày tham gia</label>
+            <p class="fw-medium mb-0"><%= new Date(user.created_at).toLocaleDateString('vi-VN') %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold py-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-geo-alt me-2 text-primary"></i>Địa chỉ nhận hàng</span>
+        <a href="/profile/address/add" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-plus me-1"></i>Thêm địa chỉ
+        </a>
+      </div>
+      <div class="card-body">
+        <% if (addresses.length === 0) { %>
+          <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Chưa có địa chỉ nào. <a href="/profile/address/add">Thêm ngay</a></p>
+        <% } else { %>
+          <div class="row g-3">
+            <% addresses.forEach(addr => { %>
+              <div class="col-md-6">
+                <div class="border rounded p-3 position-relative h-100">
+                  <% if (addr.is_default) { %>
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2">Mặc định</span>
+                  <% } %>
+                  <p class="fw-medium mb-1"><%= addr.recipient_name %></p>
+                  <p class="text-muted small mb-1"><%= addr.phone %></p>
+                  <p class="text-muted small mb-2"><%= addr.address_line %>, <%= addr.ward %>, <%= addr.district %>, <%= addr.province %></p>
+                  <div class="d-flex gap-2">
+                    <a href="/profile/address/<%= addr.id %>/edit" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                    <% if (!addr.is_default) { %>
+                      <form action="/profile/address/<%= addr.id %>/default" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Đặt mặc định</button>
+                      </form>
+                      <form action="/profile/address/<%= addr.id %>/delete" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xoá địa chỉ này?')">Xoá</button>
+                      </form>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../../partials/bot') %>

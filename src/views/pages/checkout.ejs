@@ -1,0 +1,137 @@
+<%- include('../partials/top') %>
+<h4 class="mb-4"><i class="bi bi-credit-card me-2"></i>Đặt hàng</h4>
+<form action="/orders" method="POST">
+  <div class="row">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Thông tin giao hàng</h6>
+
+          <% if (addresses && addresses.length > 0) { %>
+            <div class="mb-3">
+              <label class="form-label">Chọn địa chỉ đã lưu</label>
+              <select name="address_id" class="form-select" id="addr-select">
+                <option value="">-- Nhập địa chỉ mới --</option>
+                <% addresses.forEach(addr => { %>
+                  <option value="<%= addr.id %>"
+                          data-name="<%= addr.recipient_name %>"
+                          data-phone="<%= addr.phone %>"
+                          data-address="<%= addr.address_line %>, <%= addr.ward %>, <%= addr.district %>, <%= addr.province %>"
+                          <%= addr.is_default ? 'selected' : '' %>>
+                    <%= addr.recipient_name %> — <%= addr.address_line %>, <%= addr.ward %>
+                    <%= addr.is_default ? '(Mặc định)' : '' %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+          <% } %>
+
+          <div class="mb-3">
+            <label class="form-label">Họ tên người nhận <span class="text-danger">*</span></label>
+            <input type="text" name="shipping_name" class="form-control" required
+                   value="<%= user ? user.full_name : '' %>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="tel" name="shipping_phone" class="form-control" required
+                   value="<%= user ? (user.phone || '') : '' %>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+            <textarea name="shipping_address" class="form-control" rows="2" required
+                      placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ghi chú</label>
+            <input type="text" name="note" class="form-control" placeholder="Ghi chú cho shipper (không bắt buộc)">
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Phương thức thanh toán</h6>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="payment_method" value="cod" id="pay-cod" checked>
+            <label class="form-check-label" for="pay-cod">
+              <i class="bi bi-cash-coin text-success me-1"></i>
+              <strong>COD</strong> — Thanh toán khi nhận hàng
+            </label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="payment_method" value="bank_transfer" id="pay-bank">
+            <label class="form-check-label" for="pay-bank">
+              <i class="bi bi-bank text-primary me-1"></i>
+              <strong>Chuyển khoản ngân hàng</strong>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" value="vnpay" id="pay-vnpay">
+            <label class="form-check-label" for="pay-vnpay">
+              <i class="bi bi-qr-code text-danger me-1"></i>
+              <strong>VNPay</strong> — Thanh toán online
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Đơn hàng của bạn</h6>
+          <% items.forEach(item => { %>
+            <div class="d-flex gap-2 mb-2 align-items-center">
+              <img src="<%= item.main_image || '/images/no-image.png' %>"
+                   width="45" height="45" style="object-fit:contain" class="border rounded">
+              <div class="flex-grow-1">
+                <div class="small fw-medium" style="line-height:1.2"><%= item.name %></div>
+                <small class="text-muted">x<%= item.quantity %></small>
+              </div>
+              <span class="small fw-bold"><%= Number(item.price_at_time * item.quantity).toLocaleString('vi-VN') %>đ</span>
+            </div>
+          <% }); %>
+          <hr>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Tạm tính</span>
+            <span><%= Number(subtotal).toLocaleString('vi-VN') %>đ</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Phí vận chuyển</span>
+            <span>
+              <% if (shipping_fee === 0) { %>
+                <span class="text-success">Miễn phí</span>
+              <% } else { %>
+                <%= Number(shipping_fee).toLocaleString('vi-VN') %>đ
+              <% } %>
+            </span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+            <span>Tổng cộng</span>
+            <span class="text-danger"><%= Number(total).toLocaleString('vi-VN') %>đ</span>
+          </div>
+          <button type="submit" class="btn btn-danger w-100 py-2">
+            <i class="bi bi-check-circle me-2"></i>Xác nhận đặt hàng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+const addrSelect = document.getElementById('addr-select');
+if (addrSelect) {
+  addrSelect.addEventListener('change', () => {
+    const opt = addrSelect.options[addrSelect.selectedIndex];
+    if (opt.value) {
+      document.querySelector('[name="shipping_name"]').value = opt.dataset.name || '';
+      document.querySelector('[name="shipping_phone"]').value = opt.dataset.phone || '';
+      document.querySelector('[name="shipping_address"]').value = opt.dataset.address || '';
+    }
+  });
+  if (addrSelect.value) addrSelect.dispatchEvent(new Event('change'));
+}
+</script>
+<%- include('../partials/bot') %>

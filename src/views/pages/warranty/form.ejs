@@ -1,0 +1,26 @@
+<%- include('../../partials/top') %>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-4"><i class="bi bi-shield-check me-2 text-primary"></i>Yêu cầu bảo hành</h5>
+
+        <form action="/warranty" method="POST">
+          <input type="hidden" name="product_id" value="<%= product_id || '' %>">
+          <input type="hidden" name="order_id" value="<%= order_id || '' %>">
+
+          <div class="mb-3">
+            <label class="form-label fw-medium">Mô tả vấn đề <span class="text-danger">*</span></label>
+            <textarea name="issue_description" class="form-control" rows="5" required
+                      placeholder="Mô tả chi tiết vấn đề bạn gặp phải với sản phẩm..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-send me-2"></i>Gửi yêu cầu
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../../partials/bot') %>

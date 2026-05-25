@@ -1,0 +1,52 @@
+<%- include('../../partials/top') %>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-1">Đánh giá sản phẩm</h5>
+        <p class="text-muted mb-4"><a href="/products/<%= product.slug %>"><%= product.name %></a></p>
+
+        <form action="/reviews" method="POST">
+          <input type="hidden" name="product_id" value="<%= product_id %>">
+          <input type="hidden" name="order_id" value="<%= order_id %>">
+
+          <div class="mb-3">
+            <label class="form-label fw-medium">Số sao <span class="text-danger">*</span></label>
+            <div class="d-flex gap-2 mb-2" id="star-rating">
+              <% for(let i=1; i<=5; i++) { %>
+                <button type="button" class="btn btn-outline-warning star-btn" data-value="<%= i %>">
+                  <i class="bi bi-star"></i> <%= i %>
+                </button>
+              <% } %>
+            </div>
+            <input type="hidden" name="rating" id="rating-input" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-medium">Nhận xét</label>
+            <textarea name="comment" class="form-control" rows="4"
+                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-warning w-100">
+            <i class="bi bi-star me-2"></i>Gửi đánh giá
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.star-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = parseInt(btn.dataset.value);
+    document.getElementById('rating-input').value = val;
+    document.querySelectorAll('.star-btn').forEach((b, i) => {
+      b.classList.toggle('btn-warning', i < val);
+      b.classList.toggle('btn-outline-warning', i >= val);
+    });
+  });
+});
+</script>
+<%- include('../../partials/bot') %>

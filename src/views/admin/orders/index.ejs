@@ -1,0 +1,57 @@
+<%- include('../../partials/admin-top') %>
+<h4 class="fw-bold mb-4">Quản lý đơn hàng</h4>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-4">
+    <input type="text" name="keyword" class="form-control form-control-sm"
+           placeholder="Tìm mã đơn, tên khách..." value="<%= filters.keyword || '' %>">
+  </div>
+  <div class="col-md-3">
+    <select name="status" class="form-select form-select-sm">
+      <option value="">Tất cả trạng thái</option>
+      <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Chờ xác nhận</option>
+      <option value="confirmed" <%= filters.status === 'confirmed' ? 'selected' : '' %>>Đã xác nhận</option>
+      <option value="processing" <%= filters.status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
+      <option value="shipping" <%= filters.status === 'shipping' ? 'selected' : '' %>>Đang giao</option>
+      <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+      <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+    <a href="/admin/orders" class="btn btn-outline-secondary btn-sm ms-1">Xóa lọc</a>
+  </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover admin-table mb-0">
+      <thead>
+        <tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Ngày</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% const statusColors = {pending:'warning',confirmed:'info',processing:'primary',shipping:'primary',completed:'success',cancelled:'danger'};
+           const statusLabels = {pending:'Chờ XN',confirmed:'Đã XN',processing:'Đang XL',shipping:'Đang giao',completed:'Hoàn thành',cancelled:'Đã hủy'};
+           const payColors = {unpaid:'secondary',pending:'warning',paid:'success',failed:'danger',refunded:'info'};
+           const payLabels = {unpaid:'Chưa TT',pending:'Chờ TT',paid:'Đã TT',failed:'Thất bại',refunded:'Hoàn tiền'};
+        %>
+        <% if (orders.length === 0) { %>
+          <tr><td colspan="7" class="text-center text-muted py-4">Không có đơn hàng</td></tr>
+        <% } %>
+        <% orders.forEach(o => { %>
+          <tr>
+            <td><a href="/admin/orders/<%= o.id %>" class="text-decoration-none fw-medium">#<%= o.order_code %></a></td>
+            <td class="small"><%= o.customer_name %></td>
+            <td class="small fw-medium"><%= Number(o.total_amount).toLocaleString('vi-VN') %>đ</td>
+            <td><span class="badge bg-<%= statusColors[o.order_status] || 'secondary' %>"><%= statusLabels[o.order_status] || o.order_status %></span></td>
+            <td><span class="badge bg-<%= payColors[o.payment_status] || 'secondary' %>"><%= payLabels[o.payment_status] || o.payment_status %></span></td>
+            <td class="small text-muted"><%= new Date(o.created_at).toLocaleDateString('vi-VN') %></td>
+            <td><a href="/admin/orders/<%= o.id %>" class="btn btn-outline-primary btn-sm">Chi tiết</a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="text-muted small mt-2">Tổng: <%= total %> đơn hàng</p>
+<%- include('../../partials/admin-bot') %>

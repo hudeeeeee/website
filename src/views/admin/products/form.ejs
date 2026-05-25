@@ -1,0 +1,109 @@
+<%- include('../../partials/admin-top') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><%= product ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' %></h4>
+  <a href="/admin/products" class="btn btn-outline-secondary btn-sm">← Quay lại</a>
+</div>
+
+<form action="<%= product ? '/admin/products/' + product.id : '/admin/products' %>" method="POST" enctype="multipart/form-data">
+  <div class="row g-3">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label fw-medium">Tên sản phẩm <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" required
+                   value="<%= product ? product.name : '' %>">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Danh mục <span class="text-danger">*</span></label>
+              <select name="category_id" class="form-select" required>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>" <%= product && product.category_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Thương hiệu</label>
+              <input type="text" name="brand" class="form-control" value="<%= product ? (product.brand || '') : '' %>">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Giá gốc (đ) <span class="text-danger">*</span></label>
+              <input type="number" name="price" class="form-control" required min="0"
+                     value="<%= product ? product.price : '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Giá khuyến mãi (đ)</label>
+              <input type="number" name="sale_price" class="form-control" min="0"
+                     value="<%= product ? (product.sale_price || '') : '' %>">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Tồn kho</label>
+              <input type="number" name="stock_quantity" class="form-control" min="0"
+                     value="<%= product ? product.stock_quantity : 0 %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Bảo hành (tháng)</label>
+              <input type="number" name="warranty_months" class="form-control" min="0"
+                     value="<%= product ? product.warranty_months : 12 %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">SKU</label>
+              <input type="text" name="sku" class="form-control" value="<%= product ? (product.sku || '') : '' %>">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Mô tả</label>
+            <textarea name="description" class="form-control" rows="3"><%= product ? (product.description || '') : '' %></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Thông số kỹ thuật (JSON)</label>
+            <textarea name="specifications" class="form-control font-monospace" rows="4"
+                      placeholder='{"cpu":"Apple M2","ram":"8GB"}'><%= product ? (product.specifications || '') : '' %></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <label class="form-label fw-medium">Trạng thái</label>
+          <select name="status" class="form-select">
+            <option value="active" <%= !product || product.status === 'active' ? 'selected' : '' %>>Đang bán</option>
+            <option value="inactive" <%= product && product.status === 'inactive' ? 'selected' : '' %>>Ẩn</option>
+            <option value="out_of_stock" <%= product && product.status === 'out_of_stock' ? 'selected' : '' %>>Hết hàng</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <label class="form-label fw-medium">Ảnh sản phẩm</label>
+          <input type="file" name="images" class="form-control" accept="image/*" multiple>
+          <small class="text-muted">Tối đa 10 ảnh, JPG/PNG/WebP</small>
+          <% if (typeof images !== 'undefined' && images.length > 0) { %>
+            <div class="d-flex gap-1 flex-wrap mt-2">
+              <% images.forEach(img => { %>
+                <img src="<%= img.image_url %>" width="60" height="60" style="object-fit:cover"
+                     class="border rounded" onerror="this.src='/images/no-image.png'">
+              <% }); %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-check-lg me-1"></i><%= product ? 'Lưu thay đổi' : 'Thêm sản phẩm' %>
+      </button>
+      <a href="/admin/products" class="btn btn-outline-secondary ms-2">Hủy</a>
+    </div>
+  </div>
+</form>
+<%- include('../../partials/admin-bot') %>

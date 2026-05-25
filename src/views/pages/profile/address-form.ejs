@@ -1,0 +1,61 @@
+<%- include('../../partials/top') %>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold py-3">
+        <i class="bi bi-geo-alt me-2 text-primary"></i><%= isEdit ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới' %>
+      </div>
+      <div class="card-body p-4">
+        <form action="<%= isEdit ? '/profile/address/' + address.id + '/edit' : '/profile/address/add' %>" method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Họ tên người nhận <span class="text-danger">*</span></label>
+              <input type="text" name="recipient_name" class="form-control" required
+                     value="<%= isEdit ? address.recipient_name : '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Số điện thoại <span class="text-danger">*</span></label>
+              <input type="tel" name="phone" class="form-control" required
+                     value="<%= isEdit ? address.phone : '' %>">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Địa chỉ <span class="text-danger">*</span></label>
+              <input type="text" name="address_line" class="form-control" required
+                     placeholder="Số nhà, tên đường..."
+                     value="<%= isEdit ? address.address_line : '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Phường/Xã <span class="text-danger">*</span></label>
+              <input type="text" name="ward" class="form-control" required
+                     value="<%= isEdit ? address.ward : '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Quận/Huyện <span class="text-danger">*</span></label>
+              <input type="text" name="district" class="form-control" required
+                     value="<%= isEdit ? address.district : '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+              <input type="text" name="province" class="form-control" required
+                     value="<%= isEdit ? address.province : '' %>">
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_default" id="isDefault"
+                       <%= isEdit && address.is_default ? 'checked' : '' %>>
+                <label class="form-check-label" for="isDefault">Đặt làm địa chỉ mặc định</label>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary flex-fill">
+              <i class="bi bi-check-lg me-2"></i>Lưu địa chỉ
+            </button>
+            <a href="/profile" class="btn btn-outline-secondary flex-fill">Huỷ</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../../partials/bot') %>
