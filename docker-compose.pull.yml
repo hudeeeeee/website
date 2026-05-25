@@ -1,7 +1,6 @@
 services:
   db:
     image: haiptjits/electroshop-db:latest
-    container_name: electroshop_db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
@@ -20,7 +19,6 @@ services:
 
   app:
     image: haiptjits/electroshop:latest
-    container_name: electroshop_app
     restart: unless-stopped
     depends_on:
       db:
