@@ -47,7 +47,7 @@ services:
       VNPAY_RETURN_URL: http://localhost:3000/payment/vnpay/return
       VNPAY_IPN_URL: http://localhost:3000/payment/vnpay/ipn
     ports:
-      - "3000:3000"
+      - "0.0.0.0:3000:3000"
     volumes:
       - img_data:/app/public/img
 
