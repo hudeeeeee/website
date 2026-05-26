@@ -15,7 +15,17 @@ const createVNPayUrl = async (req, res) => {
   );
   if (!rows.length) return res.redirect('/orders');
 
-  const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  let ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  // If it's IPv6-mapped IPv4, extract the IPv4 part
+  if (ipAddr.includes('::ffff:')) {
+    ipAddr = ipAddr.split(':').pop();
+  }
+  // Basic check for IPv4, if not, fallback to a dummy IPv4
+  const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+  if (!ipv4Regex.test(ipAddr)) {
+    ipAddr = '127.0.0.1';
+  }
+
   const url = await paymentService.createVNPayUrl(orderCode, rows[0].total_amount, ipAddr);
   res.redirect(url);
 };

@@ -82,48 +82,75 @@ async function confirmBankPayment(orderId, transactionCode) {
 }
 
 function sortObject(obj) {
-  return Object.keys(obj).sort().reduce((sorted, key) => {
-    sorted[key] = obj[key];
-    return sorted;
-  }, {});
+  const sorted = {};
+  const keys = Object.keys(obj).sort();
+  for (let key of keys) {
+    sorted[key] = encodeURIComponent(obj[key]).replace(/%20/g, '+');
+  }
+  return sorted;
 }
 
 async function createVNPayUrl(orderCode, amount, ipAddr) {
   const tmnCode = process.env.VNPAY_TMN_CODE;
   const secretKey = process.env.VNPAY_HASH_SECRET;
-  const vnpUrl = process.env.VNPAY_URL;
+  let vnpUrl = process.env.VNPAY_URL;
 
   const date = new Date();
-  const createDate = date.toISOString().replace(/[-T:.Z]/g, '').substring(0, 14);
+  const tzOffset = 7 * 60 * 60 * 1000;
+  const vnTime = new Date(date.getTime() + tzOffset);
+  const createDate = vnTime.toISOString().replace(/[-T:.Z]/g, '').substring(0, 14);
 
-  // Get ngrok URL dynamically, fallback to env
   let returnUrl = process.env.VNPAY_RETURN_URL;
   const ngrokUrl = await getNgrokUrl();
   if (ngrokUrl) {
     returnUrl = `${ngrokUrl}/payment/vnpay/return`;
   }
 
-  const params = sortObject({
+  const finalIp = (ipAddr === '127.0.0.1' || ipAddr === '::1') ? '113.160.92.202' : ipAddr;
+
+  let vnp_Params = {
     vnp_Version: '2.1.0',
     vnp_Command: 'pay',
     vnp_TmnCode: tmnCode,
-    vnp_Amount: amount * 100,
+    vnp_Amount: Math.floor(amount) * 100,
     vnp_CurrCode: 'VND',
     vnp_TxnRef: orderCode,
-    vnp_OrderInfo: `Thanh toan don hang ${orderCode}`,
-    vnp_OrderType: 'other',
+    vnp_OrderInfo: 'Thanh toan cho don hang ' + orderCode,
+    vnp_OrderType: 'billpayment',
     vnp_Locale: 'vn',
     vnp_ReturnUrl: returnUrl,
-    vnp_IpAddr: ipAddr,
+    vnp_IpAddr: finalIp,
     vnp_CreateDate: createDate
-  });
+  };
 
-  const signData = querystring.stringify(params);
+  // Sort and build query string
+  const sortedKeys = Object.keys(vnp_Params).sort();
+  let signData = '';
+  let urlParams = '';
+  
+  for (let i = 0; i < sortedKeys.length; i++) {
+    const key = sortedKeys[i];
+    const value = vnp_Params[key];
+    if (value !== undefined && value !== null && value !== '') {
+      const encodedKey = encodeURIComponent(key).replace(/%20/g, '+');
+      const encodedValue = encodeURIComponent(value).replace(/%20/g, '+');
+      
+      if (signData.length > 0) {
+        signData += '&' + encodedKey + '=' + encodedValue;
+        urlParams += '&' + encodedKey + '=' + encodedValue;
+      } else {
+        signData += encodedKey + '=' + encodedValue;
+        urlParams += encodedKey + '=' + encodedValue;
+      }
+    }
+  }
+
   const hmac = crypto.createHmac('sha512', secretKey);
   const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-  params.vnp_SecureHash = signed;
-
-  return `${vnpUrl}?${querystring.stringify(params)}`;
+  
+  const finalUrl = vnpUrl + '?' + urlParams + '&vnp_SecureHash=' + signed;
+  console.log('VNPAY URL:', finalUrl);
+  return finalUrl;
 }
 
 function verifyVNPayReturn(query) {
@@ -132,8 +159,22 @@ function verifyVNPayReturn(query) {
   delete params.vnp_SecureHash;
   delete params.vnp_SecureHashType;
 
-  const sorted = sortObject(params);
-  const signData = querystring.stringify(sorted);
+  const sortedKeys = Object.keys(params).sort();
+  let signData = '';
+  for (let i = 0; i < sortedKeys.length; i++) {
+    const key = sortedKeys[i];
+    const value = params[key];
+    if (value !== undefined && value !== null && value !== '') {
+      const encodedKey = encodeURIComponent(key).replace(/%20/g, '+');
+      const encodedValue = encodeURIComponent(value).replace(/%20/g, '+');
+      if (signData.length > 0) {
+        signData += '&' + encodedKey + '=' + encodedValue;
+      } else {
+        signData += encodedKey + '=' + encodedValue;
+      }
+    }
+  }
+
   const hmac = crypto.createHmac('sha512', process.env.VNPAY_HASH_SECRET);
   const checkHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
