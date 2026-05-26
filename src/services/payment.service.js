@@ -87,12 +87,12 @@ function createVNPayUrl(orderCode, amount, ipAddr) {
     vnp_CreateDate: createDate
   });
 
-  const signData = querystring.stringify(params, { encode: false });
+  const signData = querystring.stringify(params);
   const hmac = crypto.createHmac('sha512', secretKey);
   const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
   params.vnp_SecureHash = signed;
 
-  return `${vnpUrl}?${querystring.stringify(params, { encode: false })}`;
+  return `${vnpUrl}?${querystring.stringify(params)}`;
 }
 
 function verifyVNPayReturn(query) {
@@ -102,7 +102,7 @@ function verifyVNPayReturn(query) {
   delete params.vnp_SecureHashType;
 
   const sorted = sortObject(params);
-  const signData = querystring.stringify(sorted, { encode: false });
+  const signData = querystring.stringify(sorted);
   const hmac = crypto.createHmac('sha512', process.env.VNPAY_HASH_SECRET);
   const checkHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
