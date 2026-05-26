@@ -16,7 +16,7 @@ const createVNPayUrl = async (req, res) => {
   if (!rows.length) return res.redirect('/orders');
 
   const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const url = paymentService.createVNPayUrl(orderCode, rows[0].total_amount, ipAddr);
+  const url = await paymentService.createVNPayUrl(orderCode, rows[0].total_amount, ipAddr);
   res.redirect(url);
 };
 

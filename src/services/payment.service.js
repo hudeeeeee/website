@@ -1,6 +1,30 @@
 const pool = require('../config/database');
 const crypto = require('crypto');
 const querystring = require('querystring');
+const http = require('http');
+
+async function getNgrokUrl() {
+  return new Promise((resolve) => {
+    const req = http.get('http://ngrok:4040/api/tunnels', (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const tunnels = JSON.parse(data);
+          const httpsTunnel = tunnels.tunnels.find(t => t.proto === 'https');
+          resolve(httpsTunnel ? httpsTunnel.public_url : null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.setTimeout(2000, () => {
+      req.destroy();
+      resolve(null);
+    });
+  });
+}
 
 async function getBankInfo(orderCode, userId) {
   const [rows] = await pool.query(
@@ -64,13 +88,20 @@ function sortObject(obj) {
   }, {});
 }
 
-function createVNPayUrl(orderCode, amount, ipAddr) {
+async function createVNPayUrl(orderCode, amount, ipAddr) {
   const tmnCode = process.env.VNPAY_TMN_CODE;
   const secretKey = process.env.VNPAY_HASH_SECRET;
   const vnpUrl = process.env.VNPAY_URL;
 
   const date = new Date();
   const createDate = date.toISOString().replace(/[-T:.Z]/g, '').substring(0, 14);
+
+  // Get ngrok URL dynamically, fallback to env
+  let returnUrl = process.env.VNPAY_RETURN_URL;
+  const ngrokUrl = await getNgrokUrl();
+  if (ngrokUrl) {
+    returnUrl = `${ngrokUrl}/payment/vnpay/return`;
+  }
 
   const params = sortObject({
     vnp_Version: '2.1.0',
@@ -82,7 +113,7 @@ function createVNPayUrl(orderCode, amount, ipAddr) {
     vnp_OrderInfo: `Thanh toan don hang ${orderCode}`,
     vnp_OrderType: 'other',
     vnp_Locale: 'vn',
-    vnp_ReturnUrl: process.env.VNPAY_RETURN_URL,
+    vnp_ReturnUrl: returnUrl,
     vnp_IpAddr: ipAddr,
     vnp_CreateDate: createDate
   });
