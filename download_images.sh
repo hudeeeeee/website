@@ -2,7 +2,7 @@
 
 # Download product images from GitHub repo
 BASE_URL="https://raw.githubusercontent.com/phamthanhhai003/ThucTap/main/src/public/imgs/product_image"
-TARGET_DIR="/mnt/c/Users/Admin/OneDrive/Attachments/website/public/uploads/products"
+TARGET_DIR="/mnt/c/Users/Admin/OneDrive/Attachments/website/public/img/products"
 
 echo "Downloading product images from GitHub..."
 

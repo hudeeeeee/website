@@ -4,3 +4,4 @@ node_modules
 .git
 .gitignore
 public/uploads
+public/img/products/

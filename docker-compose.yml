@@ -36,7 +36,7 @@ services:
       DB_PASS: admin123
       DB_NAME: electronics_shop
       SESSION_SECRET: electroshop-secret-key-2024-datn-hude
-      UPLOAD_DIR: public/uploads
+      UPLOAD_DIR: public/img
       MAX_FILE_SIZE: 5242880
       BANK_ACCOUNT_NUMBER: "0123456789"
       BANK_ACCOUNT_NAME: NGUYEN VAN A
@@ -49,8 +49,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - uploads:/app/public/uploads
+      - img_data:/app/public/img
 
 volumes:
   db_data:
-  uploads:
+  img_data:
