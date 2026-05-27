@@ -47,6 +47,20 @@ services:
     volumes:
       - uploads:/app/public/uploads
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: electroshop_ngrok
+    restart: unless-stopped
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:-}
+    command:
+      - "http"
+      - "app:3000"
+    ports:
+      - "4040:4040"
+    depends_on:
+      - app
+
 volumes:
   db_data:
   uploads:
