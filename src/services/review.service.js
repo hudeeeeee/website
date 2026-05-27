@@ -2,10 +2,10 @@ const pool = require('../config/database');
 
 async function canReview(userId, productId, orderId) {
   const [orders] = await pool.query(
-    "SELECT id FROM orders WHERE id = ? AND user_id = ? AND order_status = 'completed'",
+    "SELECT id FROM orders WHERE id = ? AND user_id = ? AND payment_status = 'paid' AND order_status != 'cancelled'",
     [orderId, userId]
   );
-  if (!orders.length) return { allowed: false, reason: 'Đơn hàng chưa hoàn thành hoặc không tồn tại' };
+  if (!orders.length) return { allowed: false, reason: 'Đơn hàng chưa thanh toán hoặc không tồn tại' };
 
   const [items] = await pool.query(
     'SELECT id FROM order_items WHERE order_id = ? AND product_id = ?',

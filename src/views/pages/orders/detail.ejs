@@ -43,14 +43,14 @@
             <div class="flex-grow-1">
               <div class="fw-medium"><%= item.product_name %></div>
               <small class="text-muted"><%= Number(item.price).toLocaleString('vi-VN') %>đ × <%= item.quantity %></small>
-              <% if (order.order_status === 'completed' && !order.reviewedProductIds.includes(item.product_id)) { %>
+              <% if (order.payment_status === 'paid' && order.order_status !== 'cancelled' && !order.reviewedProductIds.includes(item.product_id)) { %>
                 <div class="mt-1">
                   <a href="/reviews/create?product_id=<%= item.product_id %>&order_id=<%= order.id %>"
                      class="btn btn-outline-warning btn-sm">
                     <i class="bi bi-star me-1"></i>Viết đánh giá
                   </a>
                 </div>
-              <% } else if (order.order_status === 'completed') { %>
+              <% } else if (order.payment_status === 'paid' && order.reviewedProductIds.includes(item.product_id)) { %>
                 <div class="mt-1"><small class="text-success"><i class="bi bi-check-circle me-1"></i>Đã đánh giá</small></div>
               <% } %>
             </div>
