@@ -39,9 +39,9 @@ services:
       SESSION_SECRET: electroshop-secret-key-2024-datn-hude
       UPLOAD_DIR: public/img
       MAX_FILE_SIZE: 5242880
-      BANK_ACCOUNT_NUMBER: "0123456789"
-      BANK_ACCOUNT_NAME: NGUYEN VAN A
-      BANK_NAME: Vietcombank
+      BANK_ACCOUNT_NUMBER: "0417934401"
+      BANK_ACCOUNT_NAME: DO HUY DAT
+      BANK_NAME: MB Bank
     ports:
       - "3000:3000"
     volumes:

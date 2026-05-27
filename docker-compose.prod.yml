@@ -38,9 +38,9 @@ services:
       SESSION_SECRET: electroshop-secret-key-2024-datn-hude
       UPLOAD_DIR: public/img
       MAX_FILE_SIZE: 5242880
-      BANK_ACCOUNT_NUMBER: "0123456789"
-      BANK_ACCOUNT_NAME: NGUYEN VAN A
-      BANK_NAME: Vietcombank
+      BANK_ACCOUNT_NUMBER: "0417934401"
+      BANK_ACCOUNT_NAME: DO HUY DAT
+      BANK_NAME: MB Bank
       VNPAY_TMN_CODE: ${VNPAY_TMN_CODE:-DEMO1234}
       VNPAY_HASH_SECRET: ${VNPAY_HASH_SECRET:-DEMOSECRET1234567890ABCDEF123456}
       VNPAY_URL: ${VNPAY_URL:-https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
