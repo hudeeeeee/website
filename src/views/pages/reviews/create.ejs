@@ -1,67 +1,112 @@
 <%- include('../../partials/top') %>
+
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/orders">Đơn hàng</a></li>
+    <li class="breadcrumb-item active">Viết đánh giá</li>
+  </ol>
+</nav>
+
 <div class="row justify-content-center">
-  <div class="col-md-6">
+  <div class="col-lg-6 col-md-8">
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body d-flex align-items-center gap-3">
+        <img src="<%= product.image_url || '/images/no-image.png' %>"
+             width="64" height="64"
+             style="object-fit:contain;border-radius:8px;border:1px solid #e0e0e0"
+             onerror="this.src='/images/no-image.png'">
+        <div>
+          <div class="text-muted small mb-1"><i class="bi bi-bag-check me-1"></i>Đánh giá sản phẩm đã mua</div>
+          <a href="/products/<%= product.slug %>" class="fw-bold text-dark text-decoration-none"><%= product.name %></a>
+        </div>
+      </div>
+    </div>
+
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
-        <h5 class="fw-bold mb-1">Đánh giá sản phẩm</h5>
-        <p class="text-muted mb-4"><a href="/products/<%= product.slug %>"><%= product.name %></a></p>
+        <h5 class="fw-bold mb-4"><i class="bi bi-star me-2 text-warning"></i>Viết đánh giá</h5>
 
         <form action="/reviews" method="POST">
           <input type="hidden" name="product_id" value="<%= product_id %>">
           <input type="hidden" name="order_id" value="<%= order_id %>">
 
           <div class="mb-4">
-            <label class="form-label fw-medium">Số sao <span class="text-danger">*</span></label>
-            <div class="star-rating">
-              <input type="radio" name="rating" id="s5" value="5" required>
-              <label for="s5" title="5 sao">★</label>
-              <input type="radio" name="rating" id="s4" value="4">
-              <label for="s4" title="4 sao">★</label>
-              <input type="radio" name="rating" id="s3" value="3">
-              <label for="s3" title="3 sao">★</label>
-              <input type="radio" name="rating" id="s2" value="2">
-              <label for="s2" title="2 sao">★</label>
-              <input type="radio" name="rating" id="s1" value="1">
-              <label for="s1" title="1 sao">★</label>
+            <label class="form-label fw-medium">Chất lượng sản phẩm <span class="text-danger">*</span></label>
+            <div class="review-stars">
+              <input type="radio" id="s5" name="rating" value="5" required>
+              <label for="s5" title="Xuất sắc">★</label>
+              <input type="radio" id="s4" name="rating" value="4">
+              <label for="s4" title="Tốt">★</label>
+              <input type="radio" id="s3" name="rating" value="3">
+              <label for="s3" title="Bình thường">★</label>
+              <input type="radio" id="s2" name="rating" value="2">
+              <label for="s2" title="Không tốt">★</label>
+              <input type="radio" id="s1" name="rating" value="1">
+              <label for="s1" title="Tệ">★</label>
             </div>
+            <div class="star-hint text-muted small mt-1" id="star-hint">Chọn số sao</div>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-medium">Nhận xét</label>
+          <div class="mb-4">
+            <label class="form-label fw-medium">Nhận xét của bạn</label>
             <textarea name="comment" class="form-control" rows="4"
-                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+                      placeholder="Chia sẻ trải nghiệm thực tế về sản phẩm này..."></textarea>
+            <div class="form-text">Không bắt buộc. Nhận xét trung thực giúp ích cho người mua khác.</div>
           </div>
 
-          <button type="submit" class="btn btn-warning w-100">
-            <i class="bi bi-star me-2"></i>Gửi đánh giá
+          <button type="submit" class="btn btn-warning w-100 fw-medium">
+            <i class="bi bi-send me-2"></i>Gửi đánh giá
           </button>
         </form>
       </div>
     </div>
+
   </div>
 </div>
 
 <style>
-.star-rating {
+.review-stars {
   display: flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 2px;
 }
-.star-rating input {
-  display: none;
-}
-.star-rating label {
-  font-size: 2.2rem;
-  color: #ddd;
+.review-stars input { display: none; }
+.review-stars label {
+  font-size: 2.4rem;
+  color: #dee2e6;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color 0.1s, transform 0.1s;
   line-height: 1;
+  padding: 0 2px;
 }
-.star-rating input:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
+.review-stars input:checked ~ label,
+.review-stars label:hover,
+.review-stars label:hover ~ label {
   color: #ffc107;
 }
+.review-stars label:hover {
+  transform: scale(1.15);
+}
 </style>
+
+<script>
+const hints = { 1:'Tệ', 2:'Không tốt', 3:'Bình thường', 4:'Tốt', 5:'Xuất sắc' };
+document.querySelectorAll('.review-stars label').forEach(lbl => {
+  lbl.addEventListener('mouseenter', () => {
+    document.getElementById('star-hint').textContent = lbl.title;
+  });
+  lbl.addEventListener('mouseleave', () => {
+    const checked = document.querySelector('.review-stars input:checked');
+    document.getElementById('star-hint').textContent = checked ? hints[checked.value] : 'Chọn số sao';
+  });
+});
+document.querySelectorAll('.review-stars input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    document.getElementById('star-hint').textContent = hints[inp.value];
+  });
+});
+</script>
+
 <%- include('../../partials/bot') %>
