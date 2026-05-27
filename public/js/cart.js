@@ -55,3 +55,21 @@ function createToastContainer() {
   document.body.appendChild(div);
   return div;
 }
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.remove-item');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  try {
+    const res = await fetch(`/cart/items/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      updateCartCount();
+      location.reload();
+    } else {
+      showToast(data.message || 'Có lỗi xảy ra', 'danger');
+    }
+  } catch(e) {
+    showToast('Có lỗi xảy ra', 'danger');
+  }
+});
