@@ -40,7 +40,18 @@ async function getDashboardStats() {
     'SELECT order_code, total_amount, order_status, created_at FROM orders ORDER BY created_at DESC LIMIT 10'
   );
 
-  return { totalRevenue: revenue.total, orderByStatus, revenueByDay, topProducts, lowStock, recentOrders };
+  const [revenueByMonth] = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') AS month,
+            SUM(total_amount) AS revenue,
+            COUNT(*) AS order_count
+     FROM orders
+     WHERE order_status = 'completed' AND payment_status = 'paid'
+       AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+     GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+     ORDER BY month ASC`
+  );
+
+  return { totalRevenue: revenue.total, orderByStatus, revenueByDay, revenueByMonth, topProducts, lowStock, recentOrders };
 }
 
 async function getAdminProducts({ keyword, category, status, page = 1 }) {

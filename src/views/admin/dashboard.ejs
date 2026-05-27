@@ -36,6 +36,16 @@
   </div>
 </div>
 
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <span class="fw-bold"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Doanh thu 12 tháng gần nhất</span>
+    <small class="text-muted">Đơn hoàn thành & đã thanh toán</small>
+  </div>
+  <div class="card-body">
+    <canvas id="revenueChart" height="90"></canvas>
+  </div>
+</div>
+
 <div class="row g-3">
   <div class="col-lg-7">
     <div class="card border-0 shadow-sm">
@@ -104,4 +114,94 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const raw = <%- JSON.stringify(revenueByMonth) %>;
+
+  // Fill all 12 months kể cả tháng không có doanh thu
+  const months = [];
+  const revenues = [];
+  const orders = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const label = 'T' + (d.getMonth() + 1) + '/' + d.getFullYear();
+    const found = raw.find(r => r.month === key);
+    months.push(label);
+    revenues.push(found ? Number(found.revenue) : 0);
+    orders.push(found ? Number(found.order_count) : 0);
+  }
+
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 320);
+  grad.addColorStop(0, 'rgba(13,110,253,0.25)');
+  grad.addColorStop(1, 'rgba(13,110,253,0)');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Doanh thu (đ)',
+          data: revenues,
+          borderColor: '#0d6efd',
+          backgroundColor: grad,
+          borderWidth: 2.5,
+          pointBackgroundColor: '#0d6efd',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y'
+        },
+        {
+          type: 'bar',
+          label: 'Số đơn',
+          data: orders,
+          backgroundColor: 'rgba(25,135,84,0.15)',
+          borderColor: 'rgba(25,135,84,0.6)',
+          borderWidth: 1.5,
+          borderRadius: 6,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { usePointStyle: true, padding: 20, font: { size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.datasetIndex === 0) return ' Doanh thu: ' + Number(ctx.raw).toLocaleString('vi-VN') + 'đ';
+              return ' Số đơn: ' + ctx.raw;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: {
+          position: 'left',
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: {
+            font: { size: 11 },
+            callback: v => v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : v >= 1e3 ? (v/1e3).toFixed(0) + 'K' : v
+          }
+        },
+        y1: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { font: { size: 11 }, stepSize: 1 }
+        }
+      }
+    }
+  });
+})();
+</script>
 <%- include('../partials/admin-bot') %>
