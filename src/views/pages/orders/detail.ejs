@@ -43,16 +43,28 @@
             <div class="flex-grow-1">
               <div class="fw-medium"><%= item.product_name %></div>
               <small class="text-muted"><%= Number(item.price).toLocaleString('vi-VN') %>đ × <%= item.quantity %></small>
-              <% if (order.payment_status === 'paid' && order.order_status !== 'cancelled' && !order.reviewedProductIds.includes(item.product_id)) { %>
-                <div class="mt-1">
-                  <a href="/reviews/create?product_id=<%= item.product_id %>&order_id=<%= order.id %>"
-                     class="btn btn-outline-warning btn-sm">
-                    <i class="bi bi-star me-1"></i>Viết đánh giá
-                  </a>
-                </div>
-              <% } else if (order.payment_status === 'paid' && order.reviewedProductIds.includes(item.product_id)) { %>
-                <div class="mt-1"><small class="text-success"><i class="bi bi-check-circle me-1"></i>Đã đánh giá</small></div>
-              <% } %>
+              <div class="d-flex gap-2 flex-wrap mt-1">
+                <% if (order.payment_status === 'paid' && order.order_status !== 'cancelled') { %>
+                  <% if (!order.reviewedProductIds.includes(item.product_id)) { %>
+                    <a href="/reviews/create?product_id=<%= item.product_id %>&order_id=<%= order.id %>"
+                       class="btn btn-outline-warning btn-sm">
+                      <i class="bi bi-star me-1"></i>Viết đánh giá
+                    </a>
+                  <% } else { %>
+                    <small class="text-success align-self-center"><i class="bi bi-check-circle me-1"></i>Đã đánh giá</small>
+                  <% } %>
+                <% } %>
+                <% if (order.order_status === 'completed' && item.warranty_months > 0) { %>
+                  <% if (!order.warrantiedProductIds.includes(item.product_id)) { %>
+                    <a href="/warranty/create?product_id=<%= item.product_id %>&order_id=<%= order.id %>"
+                       class="btn btn-outline-info btn-sm">
+                      <i class="bi bi-shield-check me-1"></i>Bảo hành
+                    </a>
+                  <% } else { %>
+                    <small class="text-info align-self-center"><i class="bi bi-shield-check me-1"></i>Đã gửi bảo hành</small>
+                  <% } %>
+                <% } %>
+              </div>
             </div>
             <div class="fw-bold"><%= Number(item.total_price).toLocaleString('vi-VN') %>đ</div>
           </div>

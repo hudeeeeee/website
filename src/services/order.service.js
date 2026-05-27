@@ -114,14 +114,23 @@ async function getOrderDetail(orderCode, userId) {
   if (!rows.length) return null;
   const order = rows[0];
 
-  const [items] = await pool.query('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
+  const [items] = await pool.query(
+    `SELECT oi.*, p.warranty_months FROM order_items oi
+     JOIN products p ON oi.product_id = p.id
+     WHERE oi.order_id = ?`, [order.id]
+  );
   const [payment] = await pool.query('SELECT * FROM payments WHERE order_id = ?', [order.id]);
   const [reviews] = await pool.query(
     'SELECT product_id FROM reviews WHERE user_id = ? AND order_id = ?', [userId, order.id]
   );
   const reviewedProductIds = reviews.map(r => r.product_id);
 
-  return { ...order, items, payment: payment[0] || null, reviewedProductIds };
+  const [warranties] = await pool.query(
+    'SELECT product_id FROM warranty_requests WHERE user_id = ? AND order_id = ?', [userId, order.id]
+  );
+  const warrantiedProductIds = warranties.map(w => w.product_id);
+
+  return { ...order, items, payment: payment[0] || null, reviewedProductIds, warrantiedProductIds };
 }
 
 async function cancelOrder(orderCode, userId, reason) {
