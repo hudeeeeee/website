@@ -5,7 +5,7 @@ const getCreateReview = async (req, res) => {
   const { product_id, order_id } = req.query;
   const [products] = await pool.query(
     `SELECT p.name, p.slug,
-       (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS image_url
+       (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_main DESC, id ASC LIMIT 1) AS image_url
      FROM products p WHERE p.id = ?`, [product_id]);
   if (!products.length) return res.status(404).render('errors/404', { title: 'Sản phẩm không tìm thấy' });
 
