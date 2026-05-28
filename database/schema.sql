@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS products (
   price DECIMAL(15,0) NOT NULL,
   sale_price DECIMAL(15,0),
   stock_quantity INT NOT NULL DEFAULT 0,
-  description TEXT,
+  description MEDIUMTEXT,
   specifications TEXT,
   warranty_months INT DEFAULT 0,
   avg_rating DECIMAL(3,2) DEFAULT 0.00,
