@@ -1,7 +1,7 @@
 #!/bin/bash
 curl -fsSL https://raw.githubusercontent.com/hudeeeeee/website/main/docker-compose.pull.yml -o docker-compose.yml
 
-read -p "Nhập GEMINI_API_KEY (Enter để bỏ qua, chatbot sẽ không hoạt động): " GEMINI_KEY
+read -p "Nhập GEMINI_API_KEY (Enter để bỏ qua, chatbot sẽ không hoạt động): " GEMINI_KEY </dev/tty
 export GEMINI_API_KEY="${GEMINI_KEY:-}"
 
 docker compose pull
