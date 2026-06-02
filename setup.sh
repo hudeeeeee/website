@@ -5,7 +5,7 @@ read -p "Nhập GEMINI_API_KEY (Enter để bỏ qua, chatbot sẽ không hoạt
 export GEMINI_API_KEY="${GEMINI_KEY:-}"
 
 docker compose pull
-GEMINI_API_KEY="$GEMINI_API_KEY" docker compose up -d
+GEMINI_API_KEY="$GEMINI_API_KEY" docker compose up -d --force-recreate --remove-orphans
 
 echo ""
 echo "================================"
