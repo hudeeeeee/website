@@ -8,6 +8,7 @@ const orderRoutes = require('./order.routes');
 const paymentRoutes = require('./payment.routes');
 const reviewRoutes = require('./review.routes');
 const warrantyRoutes = require('./warranty.routes');
+const chatRoutes = require('./chat.routes');
 
 router.use('/', authRoutes);
 router.use('/', cartRoutes);
@@ -16,6 +17,7 @@ router.use('/', paymentRoutes);
 router.use('/', reviewRoutes);
 router.use('/', warrantyRoutes);
 router.use('/', productRoutes);
+router.use('/', chatRoutes);
 
 // Home (product controller with featured products)
 const productCtrl = require('../controllers/product.controller');
