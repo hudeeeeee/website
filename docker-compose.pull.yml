@@ -37,7 +37,6 @@ services:
       BANK_ACCOUNT_NUMBER: "0417934401"
       BANK_ACCOUNT_NAME: DO HUY DAT
       BANK_NAME: MB Bank
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       VNPAY_TMN_CODE: DEMO1234
       VNPAY_HASH_SECRET: DEMOSECRET1234567890ABCDEF123456
       VNPAY_URL: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
