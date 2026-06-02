@@ -4,7 +4,8 @@ curl -fsSL https://raw.githubusercontent.com/hudeeeeee/website/main/docker-compo
 echo "GEMINI_API_KEY=${GEMINI_API_KEY:-}" > .env
 
 docker compose pull
-docker compose up -d --force-recreate --remove-orphans
+docker compose down
+docker compose up -d
 
 echo ""
 echo "================================"
