@@ -380,6 +380,3 @@ python ../datn/import_crawled.py    # load vào DB + tái tạo seed.sql
 
 ---
 
-## Liên Hệ
-
-hude · sonhai0803@gmail.com
