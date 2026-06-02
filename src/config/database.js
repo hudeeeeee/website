@@ -10,7 +10,12 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
+  timezone: '+07:00'
+});
+
+pool.on('connection', (conn) => {
+  conn.query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 });
 
 module.exports = pool;
