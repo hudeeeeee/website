@@ -5,5 +5,7 @@ ENV MYSQL_DATABASE=electronics_shop
 ENV MYSQL_USER=admin123
 ENV MYSQL_PASSWORD=admin123
 
+RUN printf '[mysqld]\ncharacter-set-server=utf8mb4\ncollation-server=utf8mb4_unicode_ci\nskip-character-set-client-handshake\n\n[client]\ndefault-character-set=utf8mb4\n' > /etc/mysql/conf.d/charset.cnf
+
 COPY database/schema.sql /docker-entrypoint-initdb.d/01-schema.sql
 COPY database/seed.sql /docker-entrypoint-initdb.d/02-seed.sql
