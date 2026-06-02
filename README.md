@@ -29,6 +29,23 @@ Tích hợp chatbot tư vấn sản phẩm chạy **Gemini 2.5 Flash** với RAG
 
 ---
 
+## 🚀 Chạy Demo (1 lệnh duy nhất)
+
+> **Yêu cầu:** Docker đã cài sẵn
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/hudeeeeee/website/main/setup.sh | bash
+```
+
+Mở trình duyệt → **http://localhost:3000**
+
+| Role | Email | Mật khẩu |
+|------|-------|----------|
+| Admin | admin@electroshop.com | admin123 |
+| Khách | customer@electroshop.com | customer123 |
+
+---
+
 ## Chi Tiết: AI Agent Build Pipeline
 
 ### Cơ chế hoạt động
